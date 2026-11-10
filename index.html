@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Exam Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+}
+
+/* ========================= */
+/* TIMER AREA */
+/* ========================= */
+
+#timer-container{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#f4f6f9;
+    padding-bottom:10px;
+}
+
+#timer{
+    background:#222;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.timer-buttons{
+    text-align:center;
+}
+
+#pauseBtn,
+#resumeBtn{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    margin:5px;
+}
+
+#pauseBtn{
+    background:#ff9800;
+    color:white;
+}
+
+#resumeBtn{
+    background:#28a745;
+    color:white;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#f0f0f0;
+}
+
+.selected{
+    background:#cfe2ff;
+    border:2px solid #0d6efd;
+}
+
+.mark-btn{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:white;
+}
+
+.marked{
+    background:#ffcc80 !important;
+}
+
+.review-marked{
+    background:#e0e0e0 !important;
+    border:2px solid #9e9e9e;
+}
+
+.clear-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#dc3545;
+    color:white;
+}
+
+.submit-btn{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.review-btn{
+    padding:12px 20px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.review-question{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.unanswered{
+    color:orange;
+    font-weight:bold;
+}
+
+.correct-answer{
+    background:#d4edda;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.disabled-option{
+    pointer-events:none;
+    opacity:0.6;
+}
+
+.disabled-btn{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bank Exam MCQ Quiz</h1>
+
+<!-- ========================= -->
+<!-- TIMER -->
+<!-- ========================= -->
+
+<div id="timer-container">
+
+    <div id="timer">
+        Time Left: 20:00
+    </div>
+
+    <div class="timer-buttons">
+
+        <button id="pauseBtn" onclick="pauseTimer()">
+            Pause
+        </button>
+
+        <button id="resumeBtn" onclick="resumeTimer()" disabled>
+            Resume
+        </button>
+
+    </div>
+
+</div>
+
+<div id="quiz"></div>
+
+<button class="submit-btn" onclick="submitQuiz()">
+Submit Quiz
+</button>
+
+</div>
+
+<script>
+
+// ===============================
+// QUESTIONS AREA
+// ===============================
+
+const questions = [
+{q:"Vizag Port, located in Visakhapatnam, Andhra Pradesh, is known for a distinctive geographical feature along the eastern coastline of India. Which of the following correctly describes its importance?",options:["Only natural seaport on the shores of the Bay of Bengal","India's only riverine major port","Largest container port in India","India's first corporatised major port"],answer:0},
+{q:"Madras Port, situated in Chennai, Tamil Nadu, is an important major port on India's eastern coast. Which of the following statements correctly describes its position among Indian ports according to the given details?",options:["Largest port in Tamil Nadu and third largest port in India","Second largest port in India and largest port in Tamil Nadu","Second largest port in Tamil Nadu and India's oldest shipyard","Largest container port in India and second largest port in Tamil Nadu"],answer:1},
+{q:"V.O. Chidambaranar Port, located at Tuticorin in Tamil Nadu, is an important port on the southeastern coastline. What is its highlighted position among the ports of Tamil Nadu?",options:["Largest port in Tamil Nadu","India's first corporatised major port","Second largest port in Tamil Nadu","Only natural seaport on the Bay of Bengal"],answer:2},
+{q:"Kandla Port, officially known as Deendayal Port, is situated in Gandhidham, Gujarat. Which of the following correctly identifies its coastal importance?",options:["Major seaport on the eastern coast","India's only riverine major port","Largest container port on the Arabian Sea","Major seaport of the west coast"],answer:3},
+{q:"Jawaharlal Nehru Port (JNP), also known as Nhava Sheva, is located in Navi Mumbai, Maharashtra. Which combination of features is associated with this port?",options:["Largest container port in India; King Port of Arabian Sea","Largest port in India; India's oldest shipyard","India's only riverine major port; located on Hooghly River","India's first dedicated deep-water transshipment port"],answer:0},
+{q:"Mumbai Port, located on the western coast of Maharashtra, is distinguished by its position among Indian ports. Which of the following is its major highlight in the given table?",options:["Largest commercial port in India","Largest port in India","Largest container port in India","Second largest port in India"],answer:1},
+{q:"Marmagao Port, situated in South Goa, is recognised for its historical significance in India's maritime development. Which of the following correctly describes this port?",options:["India's first corporatised major port","India's only riverine major port","One of India's earliest modern ports","India's first dedicated deep-water transshipment port"],answer:2},
+{q:"New Mangalore Port, located in Dakshina Kannada district of Karnataka, serves the western coastline. Which of the following features is associated with this port?",options:["Located at the confluence of Mahanadi River and Bay of Bengal","Located on Wellington and Vallarpadam islands","Located at the junction of Bay of Bengal and Andaman Sea","All-weather port on the shore of the Arabian Sea"],answer:3},
+{q:"Cochin Port, situated in Kochi, Kerala, occupies an important position along India's maritime trade routes. Which of the following correctly describes its location and significance?",options:["Major port on the Arabian Sea and Indian Ocean route; located on Wellington and Vallarpadam islands","Major port on the Bay of Bengal; located near the mouth of the Dhamra River","Major port on the Arabian Sea; located at the junction of Bay of Bengal and Andaman Sea","Major port on the Hooghly River; India's only riverine major port"],answer:0},
+{q:"Paradip Port, located in Jagatsinghpur district of Odisha, has a distinctive geographical location. At which of the following locations is this port situated?",options:["Confluence of Godavari River and Arabian Sea","Confluence of Mahanadi River and Bay of Bengal","Mouth of the Dhamra River and Arabian Sea","Confluence of Hooghly River and Bay of Bengal"],answer:1},
+{q:"Haldia Port, functioning as a dock complex under Syama Prasad Mookerjee Port in West Bengal, is primarily associated with which type of port activities?",options:["Passenger and cruise tourism","Deep-water transshipment operations","Cargo and industrial activities","Container transshipment and private commercial operations"],answer:2},
+{q:"Port Blair Port, located in the Andaman and Nicobar Islands, has a distinctive geographical position in India's island territory. Which two water bodies meet near its location according to the given details?",options:["Arabian Sea and Indian Ocean","Bay of Bengal and Arabian Sea","Indian Ocean and Lakshadweep Sea","Bay of Bengal and Andaman Sea"],answer:3},
+{q:"Syama Prasad Mookerjee Port, formerly known as Kolkata Port, is located in West Bengal. Which unique distinction is associated with this port?",options:["India's only riverine major port, located on the Hooghly River","India's largest container port, located on the Arabian Sea","India's first corporatised major port, located near Chennai","India's only natural seaport on the Bay of Bengal"],answer:0},
+{q:"Kamarajar Port, formerly known as Ennore Port, is located at Ennore near Chennai in Tamil Nadu. Which of the following correctly describes its institutional and historical significance?",options:["India's first private major port and wholly owned by Adani Ports","India's first corporatised major port and a wholly owned subsidiary of Chennai Port Authority","India's largest container port and a subsidiary of Mumbai Port Authority","India's only riverine major port and a subsidiary of Kolkata Port Authority"],answer:1},
+{q:"Vadhavan Port, located at Dahanu in Maharashtra, is included among India's newly notified major ports. What is its present status according to the given table?",options:["Fully operational as India's largest container port","Operational as a private commercial port","Newly notified major port and under development","Operational as India's first corporatised major port"],answer:2},
+{q:"Galathea Bay Port, proposed on Great Nicobar Island in the Andaman and Nicobar Islands, is identified as which of the following?",options:["Non-major port for cargo handling","Deep-water port near the Dhamra River","India's only riverine major port","Newly notified major port under development"],answer:3},
+{q:"Vizhinjam International Seaport, located near Thiruvananthapuram in Kerala, is being developed under a Public-Private Partnership (PPP) model. Which unique distinction is associated with this port?",options:["India's first dedicated deep-water transshipment port","India's largest commercial port","India's only natural seaport on the Bay of Bengal","India's first corporatised major port"],answer:0},
+{q:"Mundra Port, situated in Gujarat, is an important private-sector port associated with Adani Ports. Which of the following correctly identifies its distinction?",options:["India's largest container port","India's largest commercial port","India's largest riverine port","India's second largest port"],answer:1},
+{q:"Dhamra Port, located in Odisha, is recognised as a deep-water port. Near which geographical feature is it situated?",options:["Confluence of Mahanadi River and Bay of Bengal","Hooghly River","Mouth of the Dhamra River","Confluence of Godavari River and Arabian Sea"],answer:2},
+{q:"Gangavaram Port, located near Visakhapatnam in Andhra Pradesh, is known for its port infrastructure. Which of the following correctly describes it?",options:["Private port near Chennai","Non-major port in Puducherry","Riverine port on the Hooghly River","Deep-water port near Visakhapatnam"],answer:3},
+{q:"Krishnapatnam Port, situated in Andhra Pradesh, is an important port on India's eastern coastline. Which of the following features is associated with it?",options:["Deep-water port located on the east coast","All-weather port on the Arabian Sea","Major riverine port on the Hooghly River","Private port located near Chennai"],answer:0},
+{q:"Kattupalli Port, located near Chennai in Tamil Nadu, is categorised differently from several major government-operated ports. Which description correctly identifies it?",options:["Deep-water port near Visakhapatnam","Private port located near Chennai","Non-major port in Puducherry","Major riverine port in West Bengal"],answer:1},
+{q:"Karaikal Port, situated in Puducherry, is recognised for its cargo-handling importance. How is this port classified in the given table?",options:["Major port and largest container port","Private port and deep-water transshipment port","Non-major port and important cargo-handling port","Riverine major port and industrial port"],answer:2},
+{q:"Pipavav Port, located in Gujarat, is an important port in the private sector. Along which sea is it situated?",options:["Bay of Bengal","Andaman Sea","Indian Ocean","Arabian Sea"],answer:3},
+{q:"Hazira Port, situated in Gujarat, plays an important role in maritime cargo movement. Which of the following activities is highlighted in the given table?",options:["Industrial and cargo-handling activities","Passenger tourism and island connectivity","Deep-water transshipment operations","Riverine cargo operations on the Hooghly"],answer:0},
+{q:"Gopalpur Port, located in Odisha, is an important port along India's eastern coastline. Which of the following correctly describes its characteristics?",options:["All-weather port on the Arabian Sea","Deep-water port located on the Bay of Bengal","Private port near Chennai","Major riverine port on the Hooghly River"],answer:1},
+{q:"Kakinada Port, located in Andhra Pradesh, is important for cargo movement and port infrastructure. Which of the following facilities is specifically mentioned in the given table?",options:["Only container transshipment facilities","Only passenger and cruise facilities","Anchorage and deep-water port facilities","Only industrial and petroleum cargo facilities"],answer:2},
+{q:"Which of the following pairs correctly matches a port with its state and location?",options:["Vizag Port – Tamil Nadu – Chennai","Paradip Port – West Bengal – Kolkata","Cochin Port – Karnataka – Dakshina Kannada","New Mangalore Port – Karnataka – Dakshina Kannada"],answer:3},
+{q:"Which pair of ports is located in Tamil Nadu and is associated with the Chennai region according to the given details?",options:["Madras Port and Kamarajar Port","V.O. Chidambaranar Port and Karaikal Port","Madras Port and Cochin Port","Kattupalli Port and Paradip Port"],answer:0},
+{q:"Consider the following port–state pairs: 1. Mundra Port – Gujarat 2. Dhamra Port – Odisha 3. Gangavaram Port – Andhra Pradesh 4. Pipavav Port – Gujarat. Which of the above pairs are correctly matched?",options:["Only 1 and 2","1, 2, 3 and 4","Only 2, 3 and 4","Only 1, 3 and 4"],answer:1},
+{q:"Which of the following ports is correctly matched with its distinctive geographical feature?",options:["Paradip Port – Hooghly River","Syama Prasad Mookerjee Port – Mahanadi River","Paradip Port – Confluence of Mahanadi River and Bay of Bengal","Dhamra Port – Wellington and Vallarpadam islands"],answer:2},
+{q:"Which pair of ports is located in the Andaman and Nicobar Islands according to the given table?",options:["Vizhinjam Port and Port Blair Port","Paradip Port and Galathea Bay Port","Port Blair Port and Mundra Port","Port Blair Port and Galathea Bay Port"],answer:3},
+{q:"Which of the following ports is correctly identified as India's only riverine major port and is located on the Hooghly River?",options:["Syama Prasad Mookerjee Port","Haldia Port","Paradip Port","Kamarajar Port"],answer:0},
+{q:"Which two ports are correctly associated with deep-water port characteristics in Odisha?",options:["Paradip Port and Haldia Port","Dhamra Port and Gopalpur Port","Kakinada Port and Gangavaram Port","Mundra Port and Pipavav Port"],answer:1},
+{q:"Which of the following port–highlight combinations is incorrectly matched according to the given table?",options:["Jawaharlal Nehru Port – Largest container port in India","Vizhinjam International Seaport – Dedicated deep-water transshipment port","Mundra Port – India's largest commercial port","Mumbai Port – India's only riverine major port"],answer:3},
+{q:"Which port is described as a major seaport of the west coast and is officially known as Deendayal Port?",options:["Kandla Port","Marmagao Port","New Mangalore Port","Mundra Port"],answer:0},
+{q:"Which of the following ports is associated with the distinction 'King Port of Arabian Sea' and is also known as Nhava Sheva?",options:["Mumbai Port","Jawaharlal Nehru Port","Kandla Port","Marmagao Port"],answer:1},
+{q:"Which port is described as India's first corporatised major port and is wholly owned by Chennai Port Authority?",options:["Madras Port","Kattupalli Port","Kamarajar Port","V.O. Chidambaranar Port"],answer:2},
+{q:"Which of the following port–location combinations is correctly matched?",options:["Vizhinjam International Seaport – Kochi","Cochin Port – Thiruvananthapuram","New Mangalore Port – Mumbai","Vizhinjam International Seaport – Vizhinjam, Thiruvananthapuram"],answer:3},
+
+];
+
+
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let userAnswers = new Array(questions.length).fill(null);
+
+let markedForReview = new Array(questions.length).fill(false);
+
+let submitted = false;
+
+// ===============================
+// LOAD QUIZ
+// ===============================
+
+function loadQuiz(){
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((question,index)=>{
+
+        const qDiv = document.createElement("div");
+
+        qDiv.classList.add("question");
+
+        qDiv.id = `question_${index}`;
+
+        qDiv.innerHTML = `
+        <h3>Q${index+1}. ${question.q}</h3>
+        `;
+
+        question.options.forEach((option,optIndex)=>{
+
+            const opt = document.createElement("div");
+
+            opt.classList.add("option");
+
+            opt.innerText = option;
+
+            opt.onclick = ()=>selectOption(index,optIndex,opt);
+
+            opt.id = `q${index}_opt${optIndex}`;
+
+            qDiv.appendChild(opt);
+
+        });
+
+        // MARK BUTTON
+
+        const markBtn = document.createElement("button");
+
+        markBtn.innerText = "Mark For Review";
+
+        markBtn.classList.add("mark-btn");
+
+        markBtn.onclick = ()=>toggleMark(index,markBtn);
+
+        qDiv.appendChild(markBtn);
+
+        // CLEAR BUTTON
+
+        const clearBtn = document.createElement("button");
+
+        clearBtn.innerText = "Clear";
+
+        clearBtn.classList.add("clear-btn");
+
+        clearBtn.onclick = ()=>clearAnswer(index);
+
+        qDiv.appendChild(clearBtn);
+
+        quizDiv.appendChild(qDiv);
+
+    });
+
+}
+
+// ===============================
+// SELECT OPTION
+// ===============================
+
+function selectOption(qIndex,optIndex,element){
+
+    if(submitted) return;
+
+    userAnswers[qIndex] = optIndex;
+
+    const options = document.querySelectorAll(`[id^="q${qIndex}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+
+}
+
+// ===============================
+// MARK FOR REVIEW
+// ===============================
+
+function toggleMark(index,button){
+
+    markedForReview[index] = !markedForReview[index];
+
+    const questionBox = document.getElementById(`question_${index}`);
+
+    if(markedForReview[index]){
+
+        button.classList.add("marked");
+
+        button.innerText = "Marked For Review";
+
+        questionBox.classList.add("review-marked");
+
+    }else{
+
+        button.classList.remove("marked");
+
+        button.innerText = "Mark For Review";
+
+        questionBox.classList.remove("review-marked");
+
+    }
+
+}
+
+// ===============================
+// CLEAR ANSWER
+// ===============================
+
+function clearAnswer(index){
+
+    if(submitted) return;
+
+    userAnswers[index] = null;
+
+    const options = document.querySelectorAll(`[id^="q${index}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+}
+
+// ===============================
+// SUBMIT QUIZ
+// ===============================
+
+function submitQuiz(){
+
+    if(submitted) return;
+
+    submitted = true;
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        if(userAns === null){
+
+            unansweredCount++;
+
+        }
+        else if(userAns === question.answer){
+
+            score += 1;
+            correctCount++;
+
+        }
+        else{
+
+            score -= 0.25;
+            wrongCount++;
+
+        }
+
+    });
+
+    let attempted = correctCount + wrongCount;
+
+    let accuracy = attempted > 0
+    ? ((correctCount/attempted)*100).toFixed(2)
+    : 0;
+
+    document.body.innerHTML = `
+
+    <div class="container">
+
+        <div class="result-box">
+
+            <h1>Quiz Submitted ✅</h1>
+
+            <h2>Total Score: ${score.toFixed(2)}</h2>
+
+            <h3>Correct Answers: ${correctCount}</h3>
+
+            <h3>Wrong Answers: ${wrongCount}</h3>
+
+            <h3>Unanswered Questions: ${unansweredCount}</h3>
+
+            <h3>Accuracy: ${accuracy}%</h3>
+
+            <button class="review-btn" onclick="reviewAnswers()">
+            Review Answers
+            </button>
+
+            <div id="reviewSection"></div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+// ===============================
+// REVIEW ANSWERS
+// ===============================
+
+function reviewAnswers(){
+
+    const reviewSection = document.getElementById("reviewSection");
+
+    let html = `<h1 style="margin-top:40px;">Review Section</h1>`;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        let status = "";
+        let marks = "";
+
+        if(userAns === null){
+
+            status = `<span class="unanswered">Unanswered</span>`;
+            marks = `0 Marks`;
+
+        }
+        else if(userAns === question.answer){
+
+            status = `<span class="correct">Correct ✅</span>`;
+            marks = `+1 Mark`;
+
+        }
+        else{
+
+            status = `<span class="wrong">Wrong ❌</span>`;
+            marks = `-0.25 Mark`;
+
+        }
+
+        html += `
+
+        <div class="review-question">
+
+            <h3>Q${index+1}. ${question.q}</h3>
+
+            <p>${status}</p>
+
+            <p><b>Marks:</b> ${marks}</p>
+
+            <p>
+            <b>Your Answer:</b>
+            ${
+                userAns === null
+                ? "Not Attempted"
+                : question.options[userAns]
+            }
+            </p>
+
+            <div class="correct-answer">
+            <b>Correct Answer:</b>
+            ${question.options[question.answer]}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    reviewSection.innerHTML = html;
+
+}
+
+// ===============================
+// TIMER
+// ===============================
+
+let time = 1800;
+
+let timer;
+
+let isPaused = false;
+
+function startTimer(){
+
+    timer = setInterval(()=>{
+
+        if(!isPaused){
+
+            let minutes = Math.floor(time/60);
+
+            let seconds = time%60;
+
+            document.getElementById("timer").innerText =
+            `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+
+            time--;
+
+            if(time < 0){
+
+                clearInterval(timer);
+
+                alert("Time is up! Quiz auto-submitted.");
+
+                submitQuiz();
+
+            }
+
+        }
+
+    },1000);
+
+}
+
+// ===============================
+// PAUSE TIMER
+// ===============================
+
+function pauseTimer(){
+
+    if(submitted) return;
+
+    isPaused = true;
+
+    document.getElementById("pauseBtn").disabled = true;
+
+    document.getElementById("resumeBtn").disabled = false;
+
+    // Disable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.add("disabled-option");
+    });
+
+    // Disable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = true;
+        btn.classList.add("disabled-btn");
+    });
+
+}
+// ===============================
+// RESUME TIMER
+// ===============================
+
+function resumeTimer(){
+
+    if(submitted) return;
+
+    isPaused = false;
+
+    document.getElementById("pauseBtn").disabled = false;
+
+    document.getElementById("resumeBtn").disabled = true;
+
+    // Enable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.remove("disabled-option");
+    });
+
+    // Enable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = false;
+        btn.classList.remove("disabled-btn");
+    });
+
+}
+// ===============================
+
+loadQuiz();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
